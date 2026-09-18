@@ -17,7 +17,7 @@ spec:
       containers:
         - name: app
           image: ghcr.io/mimiteto/llama-cpp-observability:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 9091
