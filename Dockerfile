@@ -1,7 +1,9 @@
 FROM python:3.14-slim
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-RUN useradd -m -u 1000 appuser
+RUN useradd -m -u 1000 appuser \
+    && mkdir /app \
+    && chown appuser:appuser /app
 
 WORKDIR /app
 COPY --chown=appuser:appuser . /app
