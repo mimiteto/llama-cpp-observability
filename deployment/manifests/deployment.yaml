@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llama-cpp-observability
+  labels:
+    app: llama-cpp-observability
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: llama-cpp-observability
+  template:
+    metadata:
+      labels:
+        app: llama-cpp-observability
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/mimiteto/llama-cpp-observability:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 9091
+          env:
+            - name: SD_HOST
+              value: "0.0.0.0"
+            - name: SD_PORT
+              value: "9091"
+            - name: LLAMA_CPP_API_URL
+              value: "http://host.docker.internal:8080"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 9091
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9091
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llama-cpp-observability
+  labels:
+    app: llama-cpp-observability
+spec:
+  type: ClusterIP
+  selector:
+    app: llama-cpp-observability
+  ports:
+    - port: 9091
+      targetPort: 9091
